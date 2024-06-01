@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar Retirada</title>
+</head>
+<body>
+    <h1>Registrar Retirada</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {{ form.as_p }}
+        {% endfor %}
+        <button type="submit">Registrar</button>
+    </form>
+    <br>
+<li><a href="{% url 'home' %}">Home</a></li>
+</body>
+</html>

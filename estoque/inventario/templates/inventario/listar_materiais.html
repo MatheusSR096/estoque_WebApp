@@ -1,0 +1,8 @@
+<h1>Materiais</h1>
+<ul>
+    {% for material in materiais %}
+        <li>{{ material.nome }} ({{ material.quantidade_disponivel }})</li>
+    {% endfor %}
+</ul>
+
+<li><a href="{% url 'home' %}">Home</a></li>

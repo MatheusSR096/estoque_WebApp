@@ -1,0 +1,8 @@
+<h1>Devedores</h1>
+<ul>
+    {% for retirada in retiradas %}
+        <li>{{ retirada.usuario.username }} - {{ retirada.material.nome }} ({{ retirada.data_retirada }})</li>
+    {% endfor %}
+</ul>
+
+<li><a href="{% url 'home' %}">Home</a></li>
