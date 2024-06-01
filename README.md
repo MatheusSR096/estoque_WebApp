@@ -1,31 +1,35 @@
-Documentação: Sistema de Controle de Estoque e Almoxarifado com Django
-Índice
-Introdução
-Requisitos
-Estrutura do Projeto
-Configuração do Ambiente
-Criação do Projeto Django
-Configuração do Aplicativo Django
-Definição dos Modelos
-Criação dos Formulários
-Definição das Views
-Configuração das URLs
-Criação dos Templates
-Testes e Migrações
-Execução do Servidor de Desenvolvimento
-Conclusão
 
-1. Introdução
+# Documentação: Sistema de Controle de Estoque e Almoxarifado com Django
+## Índice
+- Introdução
+- Requisitos
+- Estrutura do Projeto
+- Configuração do Ambiente
+- Criação do Projeto Django
+- Configuração do Aplicativo Django
+- Definição dos Modelos
+- Criação dos Formulários
+- Definição das Views
+- Configuração das URLs
+- Criação dos Templates
+- Testes e Migrações
+- Execução do Servidor de Desenvolvimento
+- Conclusão
+
+## 1. Introdução
+
 Este documento detalha o processo de criação de um sistema de controle de estoque e almoxarifado usando Django. O sistema permitirá a retirada e devolução de materiais, listará os usuários que não devolveram materiais, e incluirá uma área administrativa para gerenciar usuários e materiais.
 
-2. Requisitos
-Python 3.11
-Django 5.0.4
+## 2. Requisitos
+- Python 3.11
+- Django 5.0.4
 
-3. Estrutura do Projeto
+## 3. Estrutura do Projeto
+
 O projeto será estruturado da seguinte maneira:
 
-estoque/
+```bash
+  estoque/
 ├── inventario/
 │   ├── migrations/
 │   ├── templates/
@@ -49,39 +53,54 @@ estoque/
 │   ├── urls.py
 │   └── wsgi.py
 └── manage.py
-
-4. Configuração do Ambiente
+```
+## 4. Configuração do Ambiente
 
 Criação do Ambiente Virtual
 
+Criar Ambiente Virtual
+
+```bash
 python -m venv venv
+```
+Inicializar ambiente virtual(Windows)
+
+```bash
+venv\Scripts\activate  # Windows
+```
+Inicializar Ambiente Virtual(Linux/MacOS)
+```bash
 source venv/bin/activate  # Linux/MacOS
-venv\Scripts\activate     # Windows
+```
+Instalar o Django
+```bash
+pip Install django
+```
 
-Instalação do Django
+## 5. Criação do Projeto Django
 
-pip install django
-
-5. Criação do Projeto Django
-
+Criar Projeto
+```bash
 django-admin startproject estoque
 cd estoque
-
-6. Configuração do Aplicativo Django
+```
+## 6. Configuração do Aplicativo Django
 Criação do Aplicativo
-
+```bash
 python manage.py startapp inventario
-
-# estoque/settings.py
-
+```
+Adicionar o app ao 'estoque/settings' em INSTALLED_APPS
+```bash
 INSTALLED_APPS = [
     ...
     'inventario',
 ]
-
-7. Definição dos Modelos
+```
+## 7. Definição dos Modelos
 Modelos em inventario/models.py
 
+Criar as models para Materiais e Retirada
+```bash
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -101,30 +120,39 @@ class Retirada(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.material.nome} ({self.quantidade})"
-
-8. Criação dos Formulários
+```
+## 8. Criação dos Formulários
 Formulários em inventario/forms.py
 
-from django import forms
-from django.forms import modelformset_factory
-from .models import Retirada
+Criar os Formulários MaterialForm e RetiradaForm
+
+```bash
+class MaterialForm(forms.ModelForm):
+    class Meta:
+        model = Material
+        fields = ['nome', 'descricao', 'quantidade_disponivel', 'imagem']
 
 class RetiradaForm(forms.ModelForm):
     class Meta:
         model = Retirada
         fields = ['material', 'quantidade']
 
-RetiradaFormSet = modelformset_factory(Retirada, form=RetiradaForm, extra=3)
+RetiradaFormSet = forms.modelformset_factory(Retirada, form=RetiradaForm, extra=1)
 
-9. Definição das Views
+```
+
+
+## 9. Definição das Views
 Views em inventario/views.py
 
+Definir as Views 
+
+```bash
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Material, Retirada
 from .forms import RetiradaFormSet
 
-@login_required
 def home(request):
     return render(request, 'inventario/home.html')
 
@@ -139,7 +167,7 @@ def registrar_retirada(request):
         formset = RetiradaFormSet(request.POST)
         if formset.is_valid():
             for form in formset:
-                if form.cleaned_data:
+                if form.cleaned_data:  
                     retirada = form.save(commit=False)
                     retirada.usuario = request.user
                     retirada.save()
@@ -155,10 +183,11 @@ def registrar_retirada(request):
 def listar_devedores(request):
     retiradas = Retirada.objects.filter(data_devolucao__isnull=True)
     return render(request, 'inventario/listar_devedores.html', {'retiradas': retiradas})
-
-10. Configuração das URLs
+```
+## 10. Configuração das URLs
 URLs em inventario/urls.py
 
+``` bash
 from django.urls import path
 from . import views
 
@@ -170,9 +199,10 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 ]
-
+```
 URLs em estoque/urls.py
 
+``` bash
 from django.contrib import admin
 from django.urls import path, include
 
@@ -180,10 +210,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('inventario.urls')),
 ]
+```
 
-11. Criação dos Templates
+## 11. Criação dos Templates
 Template home.html
 
+``` bash
 <!DOCTYPE html>
 <html>
 <head>
@@ -199,9 +231,11 @@ Template home.html
     </ul>
 </body>
 </html>
+``` 
 
 Template listar_materiais.html
 
+``` bash
 <!DOCTYPE html>
 <html>
 <head>
@@ -216,9 +250,9 @@ Template listar_materiais.html
     </ul>
 </body>
 </html>
-
+```
 Template registrar_retirada.html
-
+```bash
 <!DOCTYPE html>
 <html>
 <head>
@@ -236,9 +270,10 @@ Template registrar_retirada.html
     </form>
 </body>
 </html>
-
+```
 Template listar_devedores.html
 
+```bash
 <!DOCTYPE html>
 <html>
 <head>
@@ -253,20 +288,23 @@ Template listar_devedores.html
     </ul>
 </body>
 </html>
-
-12. Testes e Migrações
+```
+## 12. Testes e Migrações
 Aplicar Migrações
-
+```bash
 python manage.py makemigrations
 python manage.py migrate
-
+```
 Criar um Superusuário
 
+```bash
 python manage.py createsuperuser
+```
+## 13. Execução do Servidor de Desenvolvimento
 
-13. Execução do Servidor de Desenvolvimento
-
+Executar no navegador
+```bash
 python manage.py runserver
-
-14. Conclusão
-Seguindo estes passos, você terá um sistema básico de controle de estoque e almoxarifado funcional usando Django. O sistema permite listar materiais, registrar retiradas, listar devedores e inclui uma área administrativa para gerenciar usuários e materiais. Ajustes e melhorias podem ser adicionados conforme necessário para atender a requisitos específicos.
+```
+## 14. Conclusão
+Este foi um sistema básico de controle de estoque e almoxarifado funcional usando Django que criei. O sistema permite listar materiais, registrar retiradas, listar devedores e inclui uma área administrativa para gerenciar usuários e materiais.
